@@ -8,7 +8,7 @@ export interface JournalEntry {
   id: string;
   title: string;
   description: string;
-  category: 'equity' | 'securities';
+  category: 'equity' | 'securities' | 'options' | 'dividend' | 'shares';
   entries: {
     account: string;
     debit?: string;
@@ -24,7 +24,7 @@ export const JOURNAL_ENTRIES: JournalEntry[] = [
     id: 'share-issuance',
     title: 'הנפקת מניות רגילות (במזומן)',
     description: 'רישום הנפקת מניות רגילות תמורת מזומן מעל הערך הנקוב.',
-    category: 'equity',
+    category: 'shares',
     entries: [
       { account: 'חובה: מזומן', debit: 'סך התמורה' },
       { account: 'זכות: הון מניות רגילות', credit: 'ערך נקוב' },
@@ -41,7 +41,7 @@ export const JOURNAL_ENTRIES: JournalEntry[] = [
     id: 'preferred-share-issuance',
     title: 'הנפקת מניות בכורה',
     description: 'רישום הנפקת מניות בכורה המקנות עדיפות בחלוקת דיווידנד או בפירוק.',
-    category: 'equity',
+    category: 'shares',
     entries: [
       { account: 'חובה: מזומן', debit: 'סך התמורה' },
       { account: 'זכות: הון מניות בכורה', credit: 'ערך נקוב' },
@@ -58,7 +58,7 @@ export const JOURNAL_ENTRIES: JournalEntry[] = [
     id: 'issuance-costs',
     title: 'הוצאות הנפקה',
     description: 'טיפול בעלויות ישירות הקשורות להנפקת מניות (קיזוז מהפרמיה או מהעודפים).',
-    category: 'equity',
+    category: 'shares',
     entries: [
       { account: 'חובה: פרמיה על מניות (או עודפים)', debit: 'עלויות הנפקה' },
       { account: 'זכות: מזומן', credit: 'עלויות הנפקה' }
@@ -74,7 +74,7 @@ export const JOURNAL_ENTRIES: JournalEntry[] = [
     id: 'dividend-declaration',
     title: 'הכרזה על דיווידנד',
     description: 'רישום האירוע במועד ההכרזה על ידי הדירקטוריון.',
-    category: 'equity',
+    category: 'dividend',
     entries: [
       { account: 'חובה: עודפים (יתרת רווח)', debit: 'סכום הדיווידנד' },
       { account: 'זכות: דיווידנד לשלם (התחייבות)', credit: 'סכום הדיווידנד' }
@@ -90,7 +90,7 @@ export const JOURNAL_ENTRIES: JournalEntry[] = [
     id: 'dividend-payment',
     title: 'תשלום דיווידנד',
     description: 'רישום התשלום בפועל לבעלי המניות.',
-    category: 'equity',
+    category: 'dividend',
     entries: [
       { account: 'חובה: דיווידנד לשלם', debit: 'סכום ששולם' },
       { account: 'זכות: מזומן', credit: 'סכום ששולם' }
@@ -106,7 +106,7 @@ export const JOURNAL_ENTRIES: JournalEntry[] = [
     id: 'stock-dividend',
     title: 'חלוקת מניות הטבה (Stock Dividend)',
     description: 'הנפקת מניות נוספות לבעלי המניות הקיימים ללא תמורה.',
-    category: 'equity',
+    category: 'shares',
     entries: [
       { account: 'חובה: עודפים / פרמיה', debit: 'ערך נקוב של מניות ההטבה' },
       { account: 'זכות: הון מניות', credit: 'ערך נקוב של מניות ההטבה' }
@@ -138,7 +138,7 @@ export const JOURNAL_ENTRIES: JournalEntry[] = [
     id: 'option-receipts',
     title: 'תקבולים על חשבון אופציות',
     description: 'קבלת מזומן עבור אופציות שטרם הונפקו או מומשו.',
-    category: 'equity',
+    category: 'options',
     entries: [
       { account: 'חובה: מזומן', debit: 'סכום שהתקבל' },
       { account: 'זכות: תקבולים על חשבון אופציות (הון)', credit: 'סכום שהתקבל' }
@@ -154,7 +154,7 @@ export const JOURNAL_ENTRIES: JournalEntry[] = [
     id: 'option-issuance',
     title: 'הנפקת אופציות (ללא תמורה מיידית)',
     description: 'רישום אופציות לעובדים או ספקים (מבוסס מניות).',
-    category: 'equity',
+    category: 'options',
     entries: [
       { account: 'חובה: הוצאות שכר (או נכס)', debit: 'שווי הוגן של האופציות' },
       { account: 'זכות: קרן הון בגין תשלום מבוסס מניות', credit: 'שווי הוגן' }
@@ -170,7 +170,7 @@ export const JOURNAL_ENTRIES: JournalEntry[] = [
     id: 'option-exercise',
     title: 'מימוש אופציות למניות',
     description: 'הפיכת אופציות למניות רגילות כנגד תוספת מימוש.',
-    category: 'equity',
+    category: 'options',
     entries: [
       { account: 'חובה: מזומן (תוספת מימוש)', debit: 'מחיר המימוש' },
       { account: 'חובה: קרן הון / תקבולים על חשבון אופציות', debit: 'יתרת הזכות בקרן' },
@@ -188,7 +188,7 @@ export const JOURNAL_ENTRIES: JournalEntry[] = [
     id: 'option-expiration',
     title: 'פקיעת אופציות',
     description: 'טיפול באופציות שלא מומשו ופג תוקפן.',
-    category: 'equity',
+    category: 'options',
     entries: [
       { account: 'חובה: קרן הון / תקבולים על חשבון אופציות', debit: 'יתרת הזכות' },
       { account: 'זכות: עודפים', credit: 'יתרת הזכות' }
