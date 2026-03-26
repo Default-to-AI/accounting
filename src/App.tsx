@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Search, 
@@ -6,8 +6,6 @@ import {
   TrendingUp, 
   PieChart, 
   ChevronLeft, 
-  Sun,
-  Moon,
   Info,
   ArrowRightLeft,
   Calculator,
@@ -27,17 +25,6 @@ export default function App() {
   const [sortBy, setSortBy] = useState<'title' | 'category'>('title');
   const [selectedEntry, setSelectedEntry] = useState<JournalEntry | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(false);
-
-  useEffect(() => {
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark');
-      document.body.style.backgroundColor = '#0a0a0a';
-    } else {
-      document.documentElement.classList.remove('dark');
-      document.body.style.backgroundColor = '#f5f5f5';
-    }
-  }, [isDarkMode]);
 
   const filteredEntries = useMemo(() => {
     const filtered = JOURNAL_ENTRIES.filter(entry => {
@@ -56,16 +43,13 @@ export default function App() {
   }, [searchTerm, selectedCategory, sortBy]);
 
   return (
-    <div className={cn(
-      "min-h-screen transition-colors duration-300 font-sans selection:bg-blue-100",
-      isDarkMode ? "dark bg-[#0a0a0a] text-gray-100" : "bg-[#f5f5f5] text-[#1a1a1a]"
-    )} dir="rtl">
+    <div className="min-h-screen font-sans selection:bg-blue-100 dark bg-[#0a0a0a] text-gray-100" dir="rtl">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-white dark:bg-[#141414] border-b border-gray-200 dark:border-gray-800 px-4 py-3 md:px-8 flex items-center justify-between shadow-sm">
+      <header className="sticky top-0 z-50 bg-[#141414] border-b border-gray-800 px-4 py-3 md:px-8 flex items-center justify-between shadow-sm">
         <div className="flex items-center gap-3">
           <button 
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg md:hidden"
+            className="p-2 hover:bg-gray-800 rounded-lg md:hidden"
           >
             {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
@@ -73,8 +57,8 @@ export default function App() {
             <Calculator size={24} />
           </div>
           <div>
-            <h1 className="text-xl font-bold tracking-tight dark:text-white">מדריך חשבונאות</h1>
-            <p className="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wider">הון עצמי וניירות ערך</p>
+            <h1 className="text-xl font-bold tracking-tight text-white">צ'יט שיט לפקודות יומן</h1>
+            <p className="text-xs text-gray-400 font-medium uppercase tracking-wider">חשבונאות: הון עצמי וניירות ערך</p>
           </div>
         </div>
 
@@ -95,7 +79,7 @@ export default function App() {
                   "px-3 py-1.5 text-xs font-bold rounded-full transition-all whitespace-nowrap",
                   selectedCategory === cat.id 
                     ? "bg-blue-600 text-white shadow-md" 
-                    : "text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+                    : "text-gray-400 hover:bg-gray-800"
                 )}
               >
                 {cat.label}
@@ -103,30 +87,18 @@ export default function App() {
             ))}
           </nav>
 
-          <div className="hidden lg:flex items-center gap-2 border-r border-gray-200 dark:border-gray-800 pr-4 mr-2">
+          <div className="hidden lg:flex items-center gap-2 border-r border-gray-800 pr-4 mr-2">
             <ArrowUpDown size={14} className="text-gray-400" />
             <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">מיין לפי:</span>
             <select 
               value={sortBy} 
               onChange={(e) => setSortBy(e.target.value as any)}
-              className="bg-transparent text-xs font-bold focus:outline-none dark:text-white cursor-pointer hover:text-blue-600 transition-colors appearance-none"
+              className="bg-transparent text-xs font-bold focus:outline-none text-white cursor-pointer hover:text-blue-600 transition-colors appearance-none"
             >
-              <option value="title" className="dark:bg-[#141414]">שם</option>
-              <option value="category" className="dark:bg-[#141414]">קטגוריה</option>
+              <option value="title" className="bg-[#141414]">שם</option>
+              <option value="category" className="bg-[#141414]">קטגוריה</option>
             </select>
           </div>
-
-          <button
-            onClick={() => setIsDarkMode(!isDarkMode)}
-            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 transition-all"
-            title={isDarkMode ? "מצב יום" : "מצב לילה"}
-          >
-            {isDarkMode ? (
-              <motion.div initial={{ scale: 0.5, rotate: -45 }} animate={{ scale: 1, rotate: 0 }}><Sun size={20} className="text-yellow-400" /></motion.div>
-            ) : (
-              <motion.div initial={{ scale: 0.5, rotate: 45 }} animate={{ scale: 1, rotate: 0 }}><Moon size={20} /></motion.div>
-            )}
-          </button>
         </div>
       </header>
 
