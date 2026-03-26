@@ -246,8 +246,8 @@ export default function App() {
                                 {row.account}
                                 {row.note && <span className="block text-xs text-gray-400 mt-1 font-normal italic">{row.note}</span>}
                               </td>
-                              <td className="p-4 text-blue-600 dark:text-blue-400 font-bold">{row.debit || '-'}</td>
-                              <td className="p-4 text-red-600 dark:text-red-400 font-bold">{row.credit || '-'}</td>
+                              <td className="p-4 text-red-600 dark:text-red-400 font-bold">{row.debit || '-'}</td>
+                              <td className="p-4 text-green-600 dark:text-green-400 font-bold">{row.credit || '-'}</td>
                             </tr>
                           ))}
                         </tbody>
