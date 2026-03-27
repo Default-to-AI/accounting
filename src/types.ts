@@ -262,6 +262,22 @@ export const JOURNAL_ENTRIES: JournalEntry[] = [
     ]
   },
   {
+    id: 'securities-valuation-down',
+    title: 'ירידת ערך ניירות ערך (FVTPL)',
+    description: 'עדכון שווי ניירות הערך לסוף תקופה (הפסד לא ממומש).',
+    category: 'securities',
+    entries: [
+      { account: 'חובה: הפסד מירידת ערך (רווח והפסד)', debit: 'גובה הירידה' },
+      { account: 'זכות: השקעה בניירות ערך סחירים', credit: 'גובה הירידה' }
+    ],
+    explanation: 'השינוי בשווי ההוגן (ירידה) מוכר מיידית כהפסד בדוח רווח והפסד.',
+    examples: [
+      { date: '31/12/2023', description: 'שווי השוק של תיק המניות ירד ב-1,500 ש"ח לעומת הערך הרשום.', amount: '1,500' },
+      { date: '30/06/2024', description: 'עדכון שווי אג"ח: מחיר השוק ירד ב-200 ש"ח.', amount: '200' },
+      { date: '31/12/2024', description: 'הכרה בהפסד לא ממומש של 3,000 ש"ח בגין ירידת שערים בבורסה.', amount: '3,000' }
+    ]
+  },
+  {
     id: 'securities-sale',
     title: 'מכירת ניירות ערך סחירים',
     description: 'מימוש ההשקעה במזומן.',
