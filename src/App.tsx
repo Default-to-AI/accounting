@@ -36,6 +36,8 @@ export default function App() {
   const [selectedGuide, setSelectedGuide] = useState<TheoryGuide | null>(null);
   const [currentPageIdx, setCurrentPageIdx] = useState(0);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [expandedSubject, setExpandedSubject] = useState<SubjectId | null>('accounting');
+  const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
 
   const selectedSubject = useMemo(() => 
     SUBJECTS.find(s => s.id === selectedSubjectId) || SUBJECTS[0], 
@@ -90,78 +92,48 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen font-sans selection:bg-blue-100 dark bg-[#0a0a0a] text-gray-100 text-right" dir="rtl">
+    <div className="h-screen font-sans selection:bg-blue-100 dark bg-[#0a0a0a] text-gray-100 text-right overflow-hidden flex flex-col" dir="rtl">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-[#141414] border-b border-gray-800 px-4 py-3 md:px-8 flex flex-col md:flex-row md:items-center justify-between shadow-sm gap-4">
+      <header className="shrink-0 bg-[#141414] border-b border-gray-800 px-4 py-2 md:px-6 flex flex-col md:flex-row md:items-center justify-between shadow-sm gap-2">
         <div className="flex items-center gap-3">
           <button 
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
             className="p-2 hover:bg-gray-800 rounded-lg lg:hidden"
           >
-            {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
+            {isSidebarOpen ? <X size={18} /> : <Menu size={18} />}
           </button>
-          <div className="bg-blue-600 p-2 rounded-lg text-white">
-            {getIcon(selectedSubject.icon, 24)}
+          <div className="bg-blue-600 p-1.5 rounded-lg text-white">
+            {getIcon(selectedSubject.icon, 20)}
           </div>
           <div>
-            <h1 className="text-xl font-bold tracking-tight text-white flex items-center">
+            <h1 className="text-lg font-bold tracking-tight text-white flex items-center">
               חשבונ<span className="text-blue-500">Ai</span>
             </h1>
-            <p className="text-xs text-gray-400 font-medium uppercase tracking-wider">{selectedSubject.name}</p>
           </div>
         </div>
 
-        {/* Custom Tab Switcher */}
-        <div className="bg-gray-950 p-1 rounded-xl border border-gray-800 flex items-center">
-          {SUBJECTS.find(s => s.id === selectedSubjectId)?.id === 'accounting' && (
-            <button 
-              onClick={() => { setActiveTab('journal'); setSelectedGuide(null); }}
-              className={cn(
-                "px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2",
-                activeTab === 'journal' ? "bg-blue-600 text-white shadow-lg" : "text-gray-400 hover:text-white"
-              )}
-            >
-              <BookOpen size={14} />
-              פקודות יומן
-            </button>
-          )}
-          <button 
-            onClick={() => { setActiveTab('theory'); setSelectedEntry(null); }}
-            className={cn(
-              "px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2",
-              activeTab === 'theory' ? "bg-green-600 text-white shadow-lg" : "text-gray-400 hover:text-white"
-            )}
-          >
-            <GraduationCap size={14} />
-            תרגילים
-          </button>
-        </div>
-
-        <div className="flex items-center gap-4 md:gap-6">
-          <nav className="hidden md:flex items-center gap-2 overflow-x-auto pb-1 max-w-[400px]">
-            {SUBJECT_CATEGORIES[selectedSubjectId].map((cat) => (
-              <button 
-                key={cat.id}
-                onClick={() => setSelectedCategory(cat.id as any)}
+        <div className="flex items-center gap-4">
+          <div className="bg-gray-950 p-0.5 rounded-lg border border-gray-800 flex items-center">
+            {SUBJECTS.map((s) => (
+              <button
+                key={s.id}
+                onClick={() => handleSubjectChange(s.id)}
                 className={cn(
-                  "px-3 py-1.5 text-xs font-bold rounded-full transition-all whitespace-nowrap",
-                  selectedCategory === cat.id 
-                    ? "bg-blue-600 text-white shadow-md" 
-                    : "text-gray-400 hover:bg-gray-800"
+                  "px-3 py-1 rounded-md text-[10px] font-bold transition-all",
+                  selectedSubjectId === s.id ? "bg-gray-800 text-white" : "text-gray-500 hover:text-gray-300"
                 )}
               >
-                {cat.label}
+                {s.name}
               </button>
             ))}
-          </nav>
+          </div>
 
           <div className="hidden lg:flex items-center gap-2 border-r border-gray-800 pr-4 mr-2">
-            <ArrowUpDown size={14} className="text-gray-400" />
-            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">מיין לפי:</span>
+            <ArrowUpDown size={12} className="text-gray-400" />
             <select 
               value={sortBy} 
               onChange={(e) => setSortBy(e.target.value as any)}
-              className="bg-transparent text-xs font-bold focus:outline-none text-white cursor-pointer hover:text-blue-600 transition-colors appearance-none"
+              className="bg-transparent text-[10px] font-bold focus:outline-none text-white cursor-pointer hover:text-blue-600 transition-colors appearance-none"
             >
               <option value="title" className="bg-[#141414]">שם</option>
               <option value="category" className="bg-[#141414]">קטגוריה</option>
@@ -171,148 +143,181 @@ export default function App() {
       </header>
 
       <main className="flex">
-        {/* Subject Sidebar */}
+        {/* Main Navigation Sidebar */}
         <aside className={cn(
           "fixed inset-y-0 right-0 z-40 w-64 bg-[#0d0d0d] border-l border-gray-800 lg:relative lg:translate-x-0 transition-transform duration-300 transform",
           isSidebarOpen ? "translate-x-0" : "translate-x-full"
         )}>
-          <div className="p-6">
-            <h2 className="text-gray-500 text-[10px] font-black uppercase tracking-[0.2em] mb-6">המקצועות שלי</h2>
-            <div className="space-y-2">
-              {SUBJECTS.map((subject) => (
-                <button
-                  key={subject.id}
-                  onClick={() => {
-                    handleSubjectChange(subject.id);
-                    setIsSidebarOpen(false);
-                  }}
+          <div className="flex flex-col h-full">
+            {/* Header / Search in Sidebar */}
+            <div className="p-4 border-b border-gray-800">
+              <h2 className="text-gray-500 text-[10px] font-black uppercase tracking-[0.2em] mb-4">ניווט</h2>
+              <div className="relative mb-4">
+                <Search className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" size={14} />
+                <input 
+                  type="text" 
+                  placeholder="חיפוש מהיר..."
+                  className="w-full bg-[#141414] border border-gray-800 rounded-lg py-1.5 pr-9 pl-3 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-white"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+
+              {/* Tab Switcher in Sidebar */}
+              <div className="bg-gray-950 p-1 rounded-lg border border-gray-800 flex items-center mb-2">
+                <button 
+                  onClick={() => setActiveTab('journal')}
                   className={cn(
-                    "w-full flex items-center gap-3 p-3 rounded-xl transition-all group",
-                    selectedSubjectId === subject.id 
-                      ? "bg-blue-600/10 text-blue-500 border border-blue-600/20" 
-                      : "text-gray-400 hover:bg-gray-800 hover:text-gray-200"
+                    "flex-1 py-1.5 rounded-md text-[10px] font-bold transition-all flex items-center justify-center gap-1.5",
+                    activeTab === 'journal' ? "bg-blue-600 text-white shadow-lg" : "text-gray-500 hover:text-gray-300"
                   )}
                 >
-                  <div className={cn(
-                    "p-2 rounded-lg transition-colors",
-                    selectedSubjectId === subject.id ? "bg-blue-600 text-white" : "bg-gray-800 group-hover:bg-gray-700"
-                  )}>
-                    {getIcon(subject.icon, 18)}
-                  </div>
-                  <div className="text-right">
-                    <div className="font-bold text-sm">{subject.name}</div>
-                    <div className="text-[10px] opacity-60 line-clamp-1">{subject.description}</div>
-                  </div>
+                  <BookOpen size={10} />
+                  יומן
                 </button>
-              ))}
+                <button 
+                  onClick={() => setActiveTab('theory')}
+                  className={cn(
+                    "flex-1 py-1.5 rounded-md text-[10px] font-bold transition-all flex items-center justify-center gap-1.5",
+                    activeTab === 'theory' ? "bg-green-600 text-white shadow-lg" : "text-gray-500 hover:text-gray-300"
+                  )}
+                >
+                  <GraduationCap size={10} />
+                  תרגילים
+                </button>
+              </div>
             </div>
 
-            <div className="mt-12 pt-12 border-t border-gray-800/50 text-right" dir="rtl">
-              <h2 className="text-gray-500 text-[10px] font-black uppercase tracking-[0.2em] mb-4">כלים מהירים</h2>
-              <div className="space-y-4">
-                {selectedSubjectId === 'statistics' ? (
-                  <>
-                    <a 
-                      href="https://normal-calcc.vercel.app/" 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="block p-4 bg-gray-900/50 rounded-2xl hover:bg-gray-800 transition-all border border-transparent hover:border-blue-500/30 group"
+            {/* Accordion List */}
+            <div className="flex-1 overflow-y-auto p-2 custom-scrollbar">
+              {SUBJECTS.map((subject) => {
+                const isSubjectExpanded = expandedSubject === subject.id;
+                const categories = SUBJECT_CATEGORIES[subject.id].filter(c => c.id !== 'all');
+                
+                return (
+                  <div key={subject.id} className="mb-2">
+                    <button
+                      onClick={() => setExpandedSubject(isSubjectExpanded ? null : subject.id)}
+                      className={cn(
+                        "w-full flex items-center justify-between p-2 rounded-lg transition-all text-right",
+                        selectedSubjectId === subject.id ? "bg-blue-600/5 text-blue-400 font-bold" : "text-gray-400 hover:bg-gray-800"
+                      )}
                     >
-                      <div className="flex items-center gap-2 mb-2 text-blue-500">
-                        <Calculator size={16} />
-                        <span className="text-xs font-bold">מחשבון התפלגות נורמלית</span>
+                      <div className="flex items-center gap-2">
+                        <div className={cn(
+                          "p-1.5 rounded-md",
+                          selectedSubjectId === subject.id ? "bg-blue-600 text-white" : "bg-gray-800"
+                        )}>
+                          {getIcon(subject.icon, 12)}
+                        </div>
+                        <span className="text-xs uppercase tracking-wider">{subject.name}</span>
                       </div>
-                      <p className="text-[10px] text-gray-400 group-hover:text-gray-300">חישוב מהיר של הסתברויות, ציוני תקן ואחוזונים במערכת מתקדמת.</p>
-                    </a>
-                    <button 
-                      onClick={() => {
-                        const formulaSheet = THEORY_GUIDES.find(g => g.id === 'stats-formula-sheet');
-                        if (formulaSheet) {
-                          setSelectedSubjectId('statistics');
-                          setActiveTab('theory');
-                          setSelectedGuide(formulaSheet);
-                          setCurrentPageIdx(0);
-                          setIsSidebarOpen(false);
-                        }
-                      }}
-                      className="w-full text-right p-4 bg-gray-900/50 rounded-2xl hover:bg-gray-800 transition-all border border-transparent hover:border-green-500/30 group"
-                    >
-                      <div className="flex items-center gap-2 mb-2 text-green-500">
-                        <FileText size={16} />
-                        <span className="text-xs font-bold">דף נוסחאות סטטיסטיקה</span>
-                      </div>
-                      <p className="text-[10px] text-gray-400 group-hover:text-gray-300">כל הנוסחאות שצריך במקום אחד - ממוצע, שונות, טעויות תקן ועוד.</p>
+                      <ChevronLeft size={14} className={cn("transition-transform", isSubjectExpanded && "-rotate-90")} />
                     </button>
-                    <button 
-                      onClick={() => {
-                        const pearsonGuide = THEORY_GUIDES.find(g => g.id === 'pearson-correlation');
-                        if (pearsonGuide) {
-                          setSelectedSubjectId('statistics');
-                          setActiveTab('theory');
-                          setSelectedGuide(pearsonGuide);
-                          setCurrentPageIdx(0);
-                          setIsSidebarOpen(false);
-                        }
-                      }}
-                      className="w-full text-right p-4 bg-gray-900/50 rounded-2xl hover:bg-gray-800 transition-all border border-transparent hover:border-purple-500/30 group"
-                    >
-                      <div className="flex items-center gap-2 mb-2 text-purple-500">
-                        <TrendingUp size={16} />
-                        <span className="text-xs font-bold">מקדם מתאם פירסון</span>
-                      </div>
-                      <p className="text-[10px] text-gray-400 group-hover:text-gray-300">למידה על קשר בין משתנים, שונות משותפת ותרגול מעשי.</p>
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <button 
-                      onClick={() => {
-                        const equityGuide = THEORY_GUIDES.find(g => g.id === 'equity-method-guide');
-                        if (equityGuide) {
-                          setSelectedSubjectId('accounting');
-                          setActiveTab('theory');
-                          setSelectedGuide(equityGuide);
-                          setIsSidebarOpen(false);
-                        }
-                      }}
-                      className="w-full text-right p-4 bg-gray-900/50 rounded-2xl hover:bg-gray-800 transition-all border border-transparent hover:border-blue-500/30 group"
-                    >
-                      <div className="flex items-center gap-2 mb-2 text-blue-500">
-                        <PieChart size={16} />
-                        <span className="text-xs font-bold">מדריך שווי מאזני</span>
-                      </div>
-                      <p className="text-[10px] text-gray-400 group-hover:text-gray-300">הסבר מפורט על שיטת האקוויטי, כולל דוגמה מלאה של אלעד ויעל.</p>
-                    </button>
-                    <button 
-                      onClick={() => {
-                        const bondsGuide = THEORY_GUIDES.find(g => g.id === 'bonds-guide');
-                        if (bondsGuide) {
-                          setSelectedSubjectId('accounting');
-                          setActiveTab('theory');
-                          setSelectedGuide(bondsGuide);
-                          setIsSidebarOpen(false);
-                        }
-                      }}
-                      className="w-full text-right p-4 bg-gray-900/50 rounded-2xl hover:bg-gray-800 transition-all border border-transparent hover:border-orange-500/30 group"
-                    >
-                      <div className="flex items-center gap-2 mb-2 text-orange-500">
-                        <Coins size={16} />
-                        <span className="text-xs font-bold">חישוב אג"ח</span>
-                      </div>
-                      <p className="text-[10px] text-gray-400 group-hover:text-gray-300">טיפול בפרמיה וניכיון, רישום פקודות יומן והצגה במאזן.</p>
-                    </button>
-                  </>
-                )}
-                <div className="p-4 bg-gray-900/50 rounded-2xl opacity-50 cursor-not-allowed text-right" dir="rtl">
-                  <LayoutDashboard size={16} className="text-orange-500 mb-2" />
-                  <p className="text-[10px] text-gray-400">מעקב אחר התקדמות למידה (בקרוב)</p>
-                </div>
+
+                    <AnimatePresence>
+                      {isSubjectExpanded && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: 'auto', opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          className="overflow-hidden mr-4 mt-1 space-y-1"
+                        >
+                          {categories.map((cat) => {
+                            const isCatExpanded = expandedCategory === cat.id;
+                            const items = activeTab === 'journal' 
+                              ? JOURNAL_ENTRIES.filter(e => e.subjectId === subject.id && e.category === cat.id)
+                              : THEORY_GUIDES.filter(g => g.subjectId === subject.id && g.category === cat.id);
+                            
+                            if (items.length === 0) return null;
+
+                            return (
+                              <div key={cat.id} className="space-y-0.5">
+                                <button
+                                  onClick={() => setExpandedCategory(isCatExpanded ? null : cat.id)}
+                                  className={cn(
+                                    "w-full flex items-center justify-between px-2 py-1.5 rounded-md text-[11px] transition-all",
+                                    selectedCategory === cat.id ? "text-white bg-gray-800/50" : "text-gray-500 hover:text-white"
+                                  )}
+                                >
+                                  <span>{cat.label}</span>
+                                  <ChevronLeft size={10} className={cn("transition-transform", isCatExpanded && "-rotate-90")} />
+                                </button>
+                                
+                                <AnimatePresence>
+                                  {isCatExpanded && (
+                                    <motion.div
+                                      initial={{ height: 0, opacity: 0 }}
+                                      animate={{ height: 'auto', opacity: 1 }}
+                                      exit={{ height: 0, opacity: 0 }}
+                                      className="overflow-hidden mr-2 space-y-0.5"
+                                    >
+                                      {items.map((item) => (
+                                        <button
+                                          key={item.id}
+                                          onClick={() => {
+                                            setSelectedSubjectId(subject.id);
+                                            if (activeTab === 'journal') setSelectedEntry(item as JournalEntry);
+                                            else {
+                                              setSelectedGuide(item as TheoryGuide);
+                                              setCurrentPageIdx(0);
+                                            }
+                                            setIsSidebarOpen(false);
+                                          }}
+                                          className={cn(
+                                            "w-full text-right px-2 py-1.5 rounded text-[10px] transition-all flex items-center justify-between border border-transparent",
+                                            (activeTab === 'journal' ? selectedEntry?.id : selectedGuide?.id) === item.id
+                                              ? activeTab === 'journal' ? "bg-blue-600 text-white" : "bg-green-600 text-white"
+                                              : "text-gray-500 hover:text-white hover:bg-gray-800/30"
+                                          )}
+                                        >
+                                          <span className="truncate">{item.title}</span>
+                                          <ChevronLeft size={8} className="opacity-0 group-hover:opacity-100" />
+                                        </button>
+                                      ))}
+                                    </motion.div>
+                                  )}
+                                </AnimatePresence>
+                              </div>
+                            );
+                          })}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Quick Tools at Bottom of Sidebar */}
+            <div className="p-4 border-t border-gray-800 mt-auto">
+              <h3 className="text-[9px] font-black uppercase text-gray-600 mb-2">עזרים</h3>
+              <div className="grid grid-cols-2 gap-2">
+                <a href="https://normal-calcc.vercel.app/" target="_blank" rel="noopener noreferrer" className="p-2 bg-gray-950 rounded border border-gray-800 hover:border-blue-500/50 transition-all text-center">
+                  <Calculator size={12} className="mx-auto mb-1 text-blue-500" />
+                  <span className="text-[8px] block text-gray-400">מחשבון</span>
+                </a>
+                <button 
+                  onClick={() => {
+                    const formulaSheet = THEORY_GUIDES.find(g => g.id === 'stats-formula-sheet');
+                    if (formulaSheet) {
+                      setSelectedSubjectId('statistics');
+                      setActiveTab('theory');
+                      setSelectedGuide(formulaSheet);
+                      setCurrentPageIdx(0);
+                    }
+                  }}
+                  className="p-2 bg-gray-950 rounded border border-gray-800 hover:border-green-500/50 transition-all text-center"
+                >
+                  <FileText size={12} className="mx-auto mb-1 text-green-500" />
+                  <span className="text-[8px] block text-gray-400">נוסחאות</span>
+                </button>
               </div>
             </div>
           </div>
         </aside>
 
-        <div className="flex-1 max-w-7xl mx-auto p-4 md:p-8">
+        <div className="flex-1 min-w-0 p-4 md:p-8">
           {/* Quick Tips Section - Subject Specific */}
           {selectedSubjectId === 'accounting' && (
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-12">
@@ -387,111 +392,11 @@ export default function App() {
             </div>
           )}
 
-        <div className="flex flex-col md:flex-row gap-8">
-        {/* Sidebar / List */}
-        <aside className={cn(
-          "md:w-80 shrink-0 space-y-6 transition-all duration-300",
-          isSidebarOpen ? "fixed inset-0 z-40 bg-white dark:bg-[#0a0a0a] p-4 md:relative md:bg-transparent md:p-0" : "hidden md:block"
-        )}>
-          <div className="relative">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-            <input 
-              type="text" 
-              placeholder={activeTab === 'journal' ? "חפש פקודת יומן..." : "חפש תרגיל..."}
-              className="w-full bg-white dark:bg-[#141414] border border-gray-200 dark:border-gray-800 rounded-xl py-3 pr-10 pl-4 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-sm dark:text-white"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-
-          <div className="space-y-2 overflow-y-auto max-h-[calc(100vh-250px)] pr-1">
-            {activeTab === 'journal' ? (
-              filteredEntries.map((entry) => (
-                <motion.button
-                  layoutId={entry.id}
-                  key={entry.id}
-                  onClick={() => {
-                    setSelectedEntry(entry);
-                    setIsSidebarOpen(false);
-                  }}
-                  className={cn(
-                    "w-full text-right p-4 rounded-xl border transition-all flex flex-col gap-1 group",
-                    selectedEntry?.id === entry.id 
-                      ? "bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-200 dark:shadow-none" 
-                      : "bg-white dark:bg-[#141414] border-gray-200 dark:border-gray-800 hover:border-blue-300 dark:hover:border-blue-700 hover:shadow-md text-gray-900 dark:text-gray-100"
-                  )}
-                >
-                  <div className="flex items-center justify-between">
-                      <span className={cn(
-                        "text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-md",
-                        selectedEntry?.id === entry.id ? "bg-blue-500 text-white" : "bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400"
-                      )}>
-                        {CATEGORY_LABELS[entry.category] || entry.category}
-                      </span>
-                    <ChevronLeft size={16} className={cn(
-                      "transition-transform",
-                      selectedEntry?.id === entry.id ? "text-white" : "text-gray-300 group-hover:text-blue-500"
-                    )} />
-                  </div>
-                  <h3 className="font-bold text-lg leading-tight">{entry.title}</h3>
-                  <p className={cn(
-                    "text-sm line-clamp-1",
-                    selectedEntry?.id === entry.id ? "text-blue-100" : "text-gray-500 dark:text-gray-400"
-                  )}>
-                    {entry.description}
-                  </p>
-                </motion.button>
-              ))
-            ) : (
-              filteredGuides.map((guide) => (
-                <motion.button
-                  layoutId={guide.id}
-                  key={guide.id}
-                  onClick={() => {
-                    setSelectedGuide(guide);
-                    setCurrentPageIdx(0);
-                    setIsSidebarOpen(false);
-                  }}
-                  className={cn(
-                    "w-full text-right p-4 rounded-xl border transition-all flex flex-col gap-1 group",
-                    selectedGuide?.id === guide.id 
-                      ? "bg-green-600 border-green-600 text-white shadow-lg shadow-green-200 dark:shadow-none" 
-                      : "bg-white dark:bg-[#141414] border-gray-200 dark:border-gray-800 hover:border-green-300 dark:hover:border-green-700 hover:shadow-md text-gray-900 dark:text-gray-100"
-                  )}
-                >
-                  <div className="flex items-center justify-between">
-                      <span className={cn(
-                        "text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-md",
-                        selectedGuide?.id === guide.id ? "bg-green-500 text-white" : "bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400"
-                      )}>
-                        {CATEGORY_LABELS[guide.category] || guide.category}
-                      </span>
-                    <ChevronLeft size={16} className={cn(
-                      "transition-transform",
-                      selectedGuide?.id === guide.id ? "text-white" : "text-gray-300 group-hover:text-green-500"
-                    )} />
-                  </div>
-                  <h3 className="font-bold text-lg leading-tight">{guide.title}</h3>
-                  <p className={cn(
-                    "text-sm line-clamp-1",
-                    selectedGuide?.id === guide.id ? "text-green-100" : "text-gray-500 dark:text-gray-400"
-                  )}>
-                    {guide.description}
-                  </p>
-                </motion.button>
-              ))
-            )}
-            {((activeTab === 'journal' && filteredEntries.length === 0) || (activeTab === 'theory' && filteredGuides.length === 0)) && (
-              <div className="text-center py-12 text-gray-400">
-                <Search size={48} className="mx-auto mb-4 opacity-20" />
-                <p>לא נמצאו תוצאות לחיפוש שלך</p>
-              </div>
-            )}
-          </div>
-        </aside>
+        <div className="flex flex-col lg:flex-row gap-6 h-[calc(100vh-120px)] overflow-hidden">
+        {/* The old navigation sidebar is now gone, replaced by the new one above */}
 
         {/* Content Area */}
-        <section className="flex-1 min-w-0">
+        <section className="flex-1 min-w-0 overflow-y-auto custom-scrollbar">
           <AnimatePresence mode="wait">
             {activeTab === 'journal' && selectedEntry ? (
               <motion.div
