@@ -113,16 +113,18 @@ export default function App() {
 
         {/* Custom Tab Switcher */}
         <div className="bg-gray-950 p-1 rounded-xl border border-gray-800 flex items-center">
-          <button 
-            onClick={() => { setActiveTab('journal'); setSelectedGuide(null); }}
-            className={cn(
-              "px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2",
-              activeTab === 'journal' ? "bg-blue-600 text-white shadow-lg" : "text-gray-400 hover:text-white"
-            )}
-          >
-            <BookOpen size={14} />
-            פקודות יומן
-          </button>
+          {SUBJECTS.find(s => s.id === selectedSubjectId)?.id === 'accounting' && (
+            <button 
+              onClick={() => { setActiveTab('journal'); setSelectedGuide(null); }}
+              className={cn(
+                "px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2",
+                activeTab === 'journal' ? "bg-blue-600 text-white shadow-lg" : "text-gray-400 hover:text-white"
+              )}
+            >
+              <BookOpen size={14} />
+              פקודות יומן
+            </button>
+          )}
           <button 
             onClick={() => { setActiveTab('theory'); setSelectedEntry(null); }}
             className={cn(
@@ -208,38 +210,100 @@ export default function App() {
             <div className="mt-12 pt-12 border-t border-gray-800/50 text-right" dir="rtl">
               <h2 className="text-gray-500 text-[10px] font-black uppercase tracking-[0.2em] mb-4">כלים מהירים</h2>
               <div className="space-y-4">
-                <a 
-                  href="https://normal-calcc.vercel.app/" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="block p-4 bg-gray-900/50 rounded-2xl hover:bg-gray-800 transition-all border border-transparent hover:border-blue-500/30 group"
-                >
-                  <div className="flex items-center gap-2 mb-2 text-blue-500">
-                    <Calculator size={16} />
-                    <span className="text-xs font-bold">מחשבון התפלגות נורמלית</span>
-                  </div>
-                  <p className="text-[10px] text-gray-400 group-hover:text-gray-300">חישוב מהיר של הסתברויות, ציוני תקן ואחוזונים במערכת מתקדמת.</p>
-                </a>
-                <button 
-                  onClick={() => {
-                    const formulaSheet = THEORY_GUIDES.find(g => g.id === 'stats-formula-sheet');
-                    if (formulaSheet) {
-                      setSelectedSubjectId('statistics');
-                      setActiveTab('theory');
-                      setSelectedGuide(formulaSheet);
-                      setCurrentPageIdx(0);
-                      setIsSidebarOpen(false);
-                    }
-                  }}
-                  className="w-full text-right p-4 bg-gray-900/50 rounded-2xl hover:bg-gray-800 transition-all border border-transparent hover:border-green-500/30 group"
-                >
-                  <div className="flex items-center gap-2 mb-2 text-green-500">
-                    <FileText size={16} />
-                    <span className="text-xs font-bold">דף נוסחאות סטטיסטיקה</span>
-                  </div>
-                  <p className="text-[10px] text-gray-400 group-hover:text-gray-300">כל הנוסחאות שצריך במקום אחד - ממוצע, שונות, טעויות תקן ועוד.</p>
-                </button>
-                <div className="p-4 bg-gray-900/50 rounded-2xl opacity-50 cursor-not-allowed">
+                {selectedSubjectId === 'statistics' ? (
+                  <>
+                    <a 
+                      href="https://normal-calcc.vercel.app/" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="block p-4 bg-gray-900/50 rounded-2xl hover:bg-gray-800 transition-all border border-transparent hover:border-blue-500/30 group"
+                    >
+                      <div className="flex items-center gap-2 mb-2 text-blue-500">
+                        <Calculator size={16} />
+                        <span className="text-xs font-bold">מחשבון התפלגות נורמלית</span>
+                      </div>
+                      <p className="text-[10px] text-gray-400 group-hover:text-gray-300">חישוב מהיר של הסתברויות, ציוני תקן ואחוזונים במערכת מתקדמת.</p>
+                    </a>
+                    <button 
+                      onClick={() => {
+                        const formulaSheet = THEORY_GUIDES.find(g => g.id === 'stats-formula-sheet');
+                        if (formulaSheet) {
+                          setSelectedSubjectId('statistics');
+                          setActiveTab('theory');
+                          setSelectedGuide(formulaSheet);
+                          setCurrentPageIdx(0);
+                          setIsSidebarOpen(false);
+                        }
+                      }}
+                      className="w-full text-right p-4 bg-gray-900/50 rounded-2xl hover:bg-gray-800 transition-all border border-transparent hover:border-green-500/30 group"
+                    >
+                      <div className="flex items-center gap-2 mb-2 text-green-500">
+                        <FileText size={16} />
+                        <span className="text-xs font-bold">דף נוסחאות סטטיסטיקה</span>
+                      </div>
+                      <p className="text-[10px] text-gray-400 group-hover:text-gray-300">כל הנוסחאות שצריך במקום אחד - ממוצע, שונות, טעויות תקן ועוד.</p>
+                    </button>
+                    <button 
+                      onClick={() => {
+                        const pearsonGuide = THEORY_GUIDES.find(g => g.id === 'pearson-correlation');
+                        if (pearsonGuide) {
+                          setSelectedSubjectId('statistics');
+                          setActiveTab('theory');
+                          setSelectedGuide(pearsonGuide);
+                          setCurrentPageIdx(0);
+                          setIsSidebarOpen(false);
+                        }
+                      }}
+                      className="w-full text-right p-4 bg-gray-900/50 rounded-2xl hover:bg-gray-800 transition-all border border-transparent hover:border-purple-500/30 group"
+                    >
+                      <div className="flex items-center gap-2 mb-2 text-purple-500">
+                        <TrendingUp size={16} />
+                        <span className="text-xs font-bold">מקדם מתאם פירסון</span>
+                      </div>
+                      <p className="text-[10px] text-gray-400 group-hover:text-gray-300">למידה על קשר בין משתנים, שונות משותפת ותרגול מעשי.</p>
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button 
+                      onClick={() => {
+                        const equityGuide = THEORY_GUIDES.find(g => g.id === 'equity-method-guide');
+                        if (equityGuide) {
+                          setSelectedSubjectId('accounting');
+                          setActiveTab('theory');
+                          setSelectedGuide(equityGuide);
+                          setIsSidebarOpen(false);
+                        }
+                      }}
+                      className="w-full text-right p-4 bg-gray-900/50 rounded-2xl hover:bg-gray-800 transition-all border border-transparent hover:border-blue-500/30 group"
+                    >
+                      <div className="flex items-center gap-2 mb-2 text-blue-500">
+                        <PieChart size={16} />
+                        <span className="text-xs font-bold">מדריך שווי מאזני</span>
+                      </div>
+                      <p className="text-[10px] text-gray-400 group-hover:text-gray-300">הסבר מפורט על שיטת האקוויטי, כולל דוגמה מלאה של אלעד ויעל.</p>
+                    </button>
+                    <button 
+                      onClick={() => {
+                        const bondsGuide = THEORY_GUIDES.find(g => g.id === 'bonds-guide');
+                        if (bondsGuide) {
+                          setSelectedSubjectId('accounting');
+                          setActiveTab('theory');
+                          setSelectedGuide(bondsGuide);
+                          setIsSidebarOpen(false);
+                        }
+                      }}
+                      className="w-full text-right p-4 bg-gray-900/50 rounded-2xl hover:bg-gray-800 transition-all border border-transparent hover:border-orange-500/30 group"
+                    >
+                      <div className="flex items-center gap-2 mb-2 text-orange-500">
+                        <Coins size={16} />
+                        <span className="text-xs font-bold">חישוב אג"ח</span>
+                      </div>
+                      <p className="text-[10px] text-gray-400 group-hover:text-gray-300">טיפול בפרמיה וניכיון, רישום פקודות יומן והצגה במאזן.</p>
+                    </button>
+                  </>
+                )}
+                <div className="p-4 bg-gray-900/50 rounded-2xl opacity-50 cursor-not-allowed text-right" dir="rtl">
                   <LayoutDashboard size={16} className="text-orange-500 mb-2" />
                   <p className="text-[10px] text-gray-400">מעקב אחר התקדמות למידה (בקרוב)</p>
                 </div>
@@ -323,10 +387,10 @@ export default function App() {
             </div>
           )}
 
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
+        <div className="flex flex-col md:flex-row gap-8">
         {/* Sidebar / List */}
         <aside className={cn(
-          "md:col-span-4 space-y-6 transition-all duration-300",
+          "md:w-80 shrink-0 space-y-6 transition-all duration-300",
           isSidebarOpen ? "fixed inset-0 z-40 bg-white dark:bg-[#0a0a0a] p-4 md:relative md:bg-transparent md:p-0" : "hidden md:block"
         )}>
           <div className="relative">
@@ -427,7 +491,7 @@ export default function App() {
         </aside>
 
         {/* Content Area */}
-        <section className="md:col-span-8">
+        <section className="flex-1 min-w-0">
           <AnimatePresence mode="wait">
             {activeTab === 'journal' && selectedEntry ? (
               <motion.div
@@ -966,21 +1030,43 @@ export default function App() {
                 </p>
                 
                 <div className="mt-12 grid grid-cols-1 sm:grid-cols-3 gap-4 w-full">
-                  <div className="p-4 bg-gray-50 dark:bg-gray-900/50 rounded-2xl text-right transition-all hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer" onClick={() => { setActiveTab('journal'); setSelectedCategory('equity'); }}>
-                    <TrendingUp className="text-blue-500 mb-2" size={24} />
-                    <h4 className="font-bold text-sm dark:text-gray-200">הון עצמי</h4>
-                    <p className="text-[10px] text-gray-400">מניות ודיווידנדים</p>
-                  </div>
-                  <div className="p-4 bg-gray-50 dark:bg-gray-900/50 rounded-2xl text-right transition-all hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer" onClick={() => { setActiveTab('journal'); setSelectedCategory('loans'); }}>
-                    <Coins className="text-green-500 mb-2" size={24} />
-                    <h4 className="font-bold text-sm dark:text-gray-200">הלוואות</h4>
-                    <p className="text-[10px] text-gray-400">ריבית והוצאות לשלם</p>
-                  </div>
-                  <div className="p-4 bg-gray-50 dark:bg-gray-900/50 rounded-2xl text-right transition-all hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer" onClick={() => { setActiveTab('theory'); setSelectedCategory('equity-method'); }}>
-                    <PieChart className="text-purple-500 mb-2" size={24} />
-                    <h4 className="font-bold text-sm dark:text-gray-200">תרגיל אקוויטי</h4>
-                    <p className="text-[10px] text-gray-400">שווי מאזני צעד-אחר-צעד</p>
-                  </div>
+                  {selectedSubjectId === 'accounting' ? (
+                    <>
+                      <div className="p-4 bg-gray-50 dark:bg-gray-900/50 rounded-2xl text-right transition-all hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer" onClick={() => { setActiveTab('journal'); setSelectedCategory('equity'); }}>
+                        <TrendingUp className="text-blue-500 mb-2" size={24} />
+                        <h4 className="font-bold text-sm dark:text-gray-200">הון עצמי</h4>
+                        <p className="text-[10px] text-gray-400">מניות ודיווידנדים</p>
+                      </div>
+                      <div className="p-4 bg-gray-50 dark:bg-gray-900/50 rounded-2xl text-right transition-all hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer" onClick={() => { setActiveTab('journal'); setSelectedCategory('loans'); }}>
+                        <Coins className="text-green-500 mb-2" size={24} />
+                        <h4 className="font-bold text-sm dark:text-gray-200">הלוואות</h4>
+                        <p className="text-[10px] text-gray-400">ריבית והוצאות לשלם</p>
+                      </div>
+                      <div className="p-4 bg-gray-50 dark:bg-gray-900/50 rounded-2xl text-right transition-all hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer" onClick={() => { setActiveTab('theory'); setSelectedCategory('equity-method'); }}>
+                        <PieChart className="text-purple-500 mb-2" size={24} />
+                        <h4 className="font-bold text-sm dark:text-gray-200">תרגיל אקוויטי</h4>
+                        <p className="text-[10px] text-gray-400">שווי מאזני צעד-אחר-צעד</p>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="p-4 bg-gray-50 dark:bg-gray-900/50 rounded-2xl text-right transition-all hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer" onClick={() => { setSelectedCategory('descriptive'); }}>
+                        <BarChart3 className="text-orange-500 mb-2" size={24} />
+                        <h4 className="font-bold text-sm dark:text-gray-200">תיאורית</h4>
+                        <p className="text-[10px] text-gray-400">ממוצע, שונות וסטיות</p>
+                      </div>
+                      <div className="p-4 bg-gray-50 dark:bg-gray-900/50 rounded-2xl text-right transition-all hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer" onClick={() => { setSelectedCategory('probability'); }}>
+                        <HelpCircle className="text-blue-500 mb-2" size={24} />
+                        <h4 className="font-bold text-sm dark:text-gray-200">הסתברות</h4>
+                        <p className="text-[10px] text-gray-400">מותנית, בייס וקומבינטוריקה</p>
+                      </div>
+                      <div className="p-4 bg-gray-50 dark:bg-gray-900/50 rounded-2xl text-right transition-all hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer" onClick={() => { setSelectedCategory('inference'); }}>
+                        <Info className="text-green-500 mb-2" size={24} />
+                        <h4 className="font-bold text-sm dark:text-gray-200">הסקה</h4>
+                        <p className="text-[10px] text-gray-400">התפלגות נורמלית ו-CLT</p>
+                      </div>
+                    </>
+                  )}
                 </div>
               </motion.div>
             )}
